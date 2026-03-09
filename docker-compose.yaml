@@ -1,0 +1,10 @@
+services:
+  test:
+    image: playwright-tests
+    build: .
+    ipc: host
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - CI=1
