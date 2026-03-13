@@ -26,14 +26,13 @@ export class ProductsPage extends BasePage {
   }
 
   async addProductToCart(index: number) {
-    const product = this.productItems.nth(index);
-
-    const addToCart = product.locator(".add-to-cart").first();
-
-    await product.scrollIntoViewIfNeeded();
-    await product.hover();
-
-    await addToCart.click({ force: true });
+    // The page contains 2 'Add to cart' buttons for each product.
+    // The .first() and the .nth(1).
+    // The .first() is invisible until a normal user hovers
+    // over the product. It is meant to be used after the slide
+    // animation of the card finishes.
+    const addToCart = await this.page.locator(`[data-product-id="${index}"]`).first();
+    await addToCart.click();
   }
 
   async continueShopping() {

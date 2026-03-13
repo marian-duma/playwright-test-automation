@@ -4,7 +4,6 @@ import { LoginPage } from "../pages/login.page";
 import { SignupPage, UserData } from "../pages/signup.page";
 import { ProductsPage } from "../pages/products.page";
 import { CartPage } from "../pages/cart.page";
-const baseUrl: string = "https://automationexercise.com/";
 
 export const user: UserData = {
   title: "Mr",
@@ -32,8 +31,8 @@ test.describe("Account creation and deletion", () => {
     await page.route("**/*googlesyndication.com/**", (route) => route.abort());
     await page.route("**/*google-analytics.com/**", (route) => route.abort());
 
-    await page.goto(baseUrl);
-    await expect(page).toHaveTitle(/automation exercise/i);
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
     const basePage = new BasePage(page);
     await basePage.handleGDPR();
     await basePage.clickLogin();
@@ -66,7 +65,7 @@ test.describe("Account creation and deletion", () => {
   });
 });
 
-test.describe.only("Authentication", () => {
+test.describe("Authentication", () => {
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage();
 
@@ -74,7 +73,8 @@ test.describe.only("Authentication", () => {
     await page.route("**/*googlesyndication.com/**", (route) => route.abort());
     await page.route("**/*google-analytics.com/**", (route) => route.abort());
 
-    await page.goto(baseUrl);
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
     const basePage = new BasePage(page);
     await basePage.handleGDPR();
     await basePage.clickLogin();
@@ -94,7 +94,8 @@ test.describe.only("Authentication", () => {
     await page.route("**/*googlesyndication.com/**", (route) => route.abort());
     await page.route("**/*google-analytics.com/**", (route) => route.abort());
 
-    await page.goto(baseUrl);
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
 
     const basePage = new BasePage(page);
     await basePage.clickLogin();
@@ -118,32 +119,32 @@ test.describe.only("Authentication", () => {
       console.log("End!");
     }
   });
-  // test("Add items to cart", async ({ page }) => {
-  //   const basePage = new BasePage(page);
-  //   const productsPage = new ProductsPage(page);
-  //   const cartPage = new CartPage(page);
 
-  //   await test.step("Add item to cart", async () => {
-  //     await basePage.clickProducts();
+  test("Add items to cart", async ({ page }) => {
+    const basePage = new BasePage(page);
+    const productsPage = new ProductsPage(page);
+    const cartPage = new CartPage(page);
 
-  //     await productsPage.addProductToCart(1);
-  //     await productsPage.continueShopping();
+    await test.step("Add item to cart", async () => {
+      await basePage.clickProducts();
 
-  //     await productsPage.addProductToCart(2);
-  //     await productsPage.continueShopping();
+      await productsPage.addProductToCart(1);
+      await productsPage.continueShopping();
 
-  //     await basePage.clickCart();
+      await productsPage.addProductToCart(2);
+      await productsPage.continueShopping();
 
-  //     await cartPage.expectProductVisible(1);
-  //     await cartPage.expectProductVisible(2);
+      await basePage.clickCart();
 
-  //     await cartPage.expectPrice(1, "Rs. 500");
-  //     await cartPage.expectQuantity(1, "1");
-  //     await cartPage.expectTotal(1, "Rs. 500");
+      await expect(cartPage.productRow(1)).toBeVisible();
+      await expect(cartPage.productPrice(1)).toHaveText("Rs. 500");
+      await expect(cartPage.productQuantity(1)).toHaveText("1");
+      await expect(cartPage.productTotal(1)).toHaveText("Rs. 500");
 
-  //     await cartPage.expectPrice(2, "Rs. 400");
-  //     await cartPage.expectQuantity(2, "1");
-  //     await cartPage.expectTotal(2, "Rs. 400");
-  //   });
-  // });
+      await expect(cartPage.productRow(2)).toBeVisible();
+      await expect(cartPage.productPrice(2)).toHaveText("Rs. 400");
+      await expect(cartPage.productQuantity(2)).toHaveText("1");
+      await expect(cartPage.productTotal(2)).toHaveText("Rs. 400");
+    });
+  });
 });
