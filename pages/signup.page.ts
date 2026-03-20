@@ -1,26 +1,6 @@
 import { Page } from "@playwright/test";
 import { BasePage } from "./base.page";
-
-export interface UserData {
-  title: "Mr" | "Mrs";
-  name: string;
-  email: string;
-  password: string;
-  days: string;
-  months: string;
-  years: string;
-  firstName: string;
-  lastName: string;
-  address: string;
-  country: string;
-  state: string;
-  city: string;
-  zipcode: string;
-  mobileNumber: string;
-  newsletter?: boolean;
-  optin?: boolean;
-}
-
+import { UserData } from "../utils/user.generator";
 export class SignupPage extends BasePage {
   readonly page: Page;
 

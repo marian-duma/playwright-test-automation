@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Stefan-Duma/playwright-test-automation#readme",
   "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@playwright/test": "^1.58.2",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.4"
