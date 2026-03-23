@@ -3,6 +3,7 @@ import { BasePage } from "../../pages/base.page";
 import { LoginPage } from "../../pages/login.page";
 import { SignupPage } from "../../pages/signup.page";
 import { generateUserData, UserData } from "../../utils/user.generator";
+import { handleGDPR } from "../../utils/ads.handler";
 
 test.describe("Account creation and deletion", () => {
   let user: UserData;
@@ -14,9 +15,9 @@ test.describe("Account creation and deletion", () => {
 
     await page.goto("/");
     await expect(page).toHaveURL("/");
+    await handleGDPR(page);
 
     const basePage = new BasePage(page);
-    await basePage.handleGDPR();
     await basePage.clickLogin();
   });
 

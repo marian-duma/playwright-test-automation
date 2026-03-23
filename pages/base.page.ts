@@ -2,7 +2,6 @@ import { Page, Locator } from "@playwright/test";
 
 export class BasePage {
   readonly page: Page;
-  readonly consentButton: Locator;
 
   readonly homeButton: Locator;
   readonly productsButton: Locator;
@@ -12,7 +11,6 @@ export class BasePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.consentButton = page.getByRole("button", { name: /consent/i });
 
     this.homeButton = page.getByRole("link", { name: /home/i });
     this.productsButton = page.getByRole("link", { name: /products/i });
@@ -34,13 +32,6 @@ export class BasePage {
 
   async clickLogin() {
     await this.loginButton.click();
-  }
-
-  async handleGDPR() {
-    if (await this.consentButton.isVisible({ timeout: 1500 })) {
-      console.log("GDPR popup appeared!");
-      await this.consentButton.click();
-    }
   }
 
   async logout() {
