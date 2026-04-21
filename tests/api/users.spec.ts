@@ -43,7 +43,7 @@ test.describe("User Management API", () => {
   test("API 10: POST To Verify Login with invalid details", async () => {
     const response = await usersApi.postVerifyLogin(
       "invalid_email@example.com",
-      "wrongpassword123"
+      "Wrongpassword123"
     );
     const body = await response.json();
 
