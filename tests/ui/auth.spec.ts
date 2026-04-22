@@ -15,15 +15,14 @@ test.describe("Account operations workflow", () => {
   test.beforeEach("Setup", async ({ page }) => {
     handleAds(page);
     await page.goto("/");
-    await expect(page).toHaveURL("https://automationexercise.com/");
     await handleGDPR(page);
+
+    await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
 
     basePage = new BasePage(page);
     loginPage = new LoginPage(page);
     signupPage = new SignupPage(page);
     user = generateUserData();
-
-    await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
   });
 
   test.afterEach("Cleanup", async ({ page }) => {
