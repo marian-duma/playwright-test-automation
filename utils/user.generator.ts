@@ -20,6 +20,14 @@ export interface UserData {
   optin?: boolean;
 }
 
+export interface PaymentData {
+  cardName: string;
+  cardNumber: string;
+  cvv: string;
+  expiryMonth: string;
+  expiryYear: string;
+}
+
 export const generateUserData = (): UserData => {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
@@ -42,5 +50,15 @@ export const generateUserData = (): UserData => {
     mobileNumber: faker.phone.number({ style: "national" }).replace(/\D/g, "").substring(0, 10),
     newsletter: true,
     optin: true,
+  };
+};
+
+export const generatePaymentData = (): PaymentData => {
+  return {
+    cardName: faker.person.fullName(),
+    cardNumber: faker.finance.creditCardNumber().replaceAll("-", ""),
+    cvv: faker.finance.creditCardCVV(),
+    expiryMonth: faker.date.month({ context: true }).slice(0, 2),
+    expiryYear: faker.date.future({ years: 5 }).getFullYear().toString(),
   };
 };

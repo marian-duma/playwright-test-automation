@@ -14,7 +14,7 @@ export class BasePage {
 
     this.homeButton = page.getByRole("link", { name: /home/i });
     this.productsButton = page.getByRole("link", { name: /products/i });
-    this.cartButton = page.getByRole("link", { name: /cart/i });
+    this.cartButton = page.getByRole("link", { name: /cart/i }).first();
     this.loginButton = page.getByRole("link", { name: /signup\s*\/\s*login/i });
     this.contactUsButton = page.getByRole("link", { name: /contact us/i });
   }

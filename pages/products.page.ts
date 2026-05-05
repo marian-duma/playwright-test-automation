@@ -31,7 +31,7 @@ export class ProductsPage extends BasePage {
     // The .first() is invisible until a normal user hovers
     // over the product. It is meant to be used after the slide
     // animation of the card finishes.
-    const addToCart = await this.page.locator(`[data-product-id="${index}"]`).first();
+    const addToCart = this.page.locator(`[data-product-id="${index}"]`).first();
     await addToCart.click();
   }
 

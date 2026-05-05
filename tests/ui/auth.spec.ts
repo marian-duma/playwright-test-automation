@@ -16,7 +16,6 @@ test.describe("Account operations workflow", () => {
     handleAds(page);
     await page.goto("/");
     await handleGDPR(page);
-
     await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
 
     basePage = new BasePage(page);

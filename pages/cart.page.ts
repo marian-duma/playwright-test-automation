@@ -22,4 +22,8 @@ export class CartPage {
   productTotal(index: number) {
     return this.productRow(index).locator(".cart_total");
   }
+
+  productRemove(index: number) {
+    return this.productRow(index).locator(".cart_quantity_delete");
+  }
 }

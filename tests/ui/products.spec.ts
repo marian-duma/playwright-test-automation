@@ -3,7 +3,7 @@ import { BasePage } from "../../pages/base.page";
 import { ProductsPage } from "../../pages/products.page";
 import { handleAds, handleGDPR } from "../../utils/ads.handler";
 
-test.describe("Automation Exercise - Products and Search Tests", () => {
+test.describe("Products and Search Tests", () => {
   let basePage: BasePage;
   let productsPage: ProductsPage;
 
@@ -74,7 +74,7 @@ test.describe("Automation Exercise - Products and Search Tests", () => {
     await expect(page.getByRole("heading", { name: /Brand - H&M Products/i })).toBeVisible();
   });
 
-  test.only("Test Case 21: Add review on product", async ({ page }) => {
+  test("Test Case 21: Add review on product", async ({ page }) => {
     await basePage.clickProducts();
     await expect(page).toHaveURL(/.*products/);
     await page
