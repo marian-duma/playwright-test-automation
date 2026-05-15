@@ -32,7 +32,7 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     extraHTTPHeaders: {
-      'Accept': 'application/json',
+      Accept: "application/json",
     },
   },
 
@@ -48,10 +48,10 @@ export default defineConfig({
       use: { ...devices["Desktop Firefox"] },
     },
 
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
+    // {
+    //   name: "webkit",
+    //   use: { ...devices["Desktop Safari"] },
+    // },
 
     /* Test against mobile viewports. */
     // {

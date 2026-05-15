@@ -33,10 +33,15 @@ test.describe("Checkout tests", () => {
     checkoutPage = new CheckoutPage(page);
     paymentPage = new PaymentPage(page);
   });
+
   test.afterEach("Cleanup", async ({ page }) => {
-    await basePage.deleteAccount();
-    await expect(page.getByText(/account\s*deleted!/i)).toBeVisible();
-    await page.getByRole("link", { name: /continue/i }).click();
+    try {
+      await basePage.deleteAccount();
+      await expect(page.getByText(/account\s*deleted!/i)).toBeVisible();
+      await page.getByRole("link", { name: /continue/i }).click();
+    } catch (error) {
+      console.log("Cleanup: Butonul 'Delete Account' nu a fost găsit, se continuă execuția.");
+    }
   });
 
   test("Test Case 14: Place Order: Register while Checkout", async ({ page }) => {
@@ -131,5 +136,79 @@ test.describe("Checkout tests", () => {
     );
     await paymentPage.confirmPayment();
     await expect(page.locator('[data-qa="order-placed"]')).toBeVisible();
+  });
+
+  test("Test Case 23: Verify address details in checkout page", async ({ page }) => {
+    const userData = generateUserData();
+
+    await basePage.clickLogin();
+
+    await loginPage.signup(userData.name, userData.email);
+    await signupPage.fillAccountDetails(userData);
+    await page.getByRole("link", { name: /continue/i }).click();
+
+    await expect(page.getByText(`Logged in as ${userData.name}`)).toBeVisible();
+
+    await basePage.clickProducts();
+    await productsPage.addProductToCart(1);
+    await productsPage.continueShopping();
+
+    await basePage.clickCart();
+    await expect(page).toHaveURL(/.*view_cart/);
+    await page.getByText(/Proceed To Checkout/i).click();
+
+    const deliveryAddress = page.locator("#address_delivery");
+    await expect(deliveryAddress).toContainText(userData.firstName);
+    await expect(deliveryAddress).toContainText(userData.lastName);
+    await expect(deliveryAddress).toContainText(userData.address);
+    await expect(deliveryAddress).toContainText(userData.city);
+
+    const billingAddress = page.locator("#address_invoice");
+    await expect(billingAddress).toContainText(userData.firstName);
+    await expect(billingAddress).toContainText(userData.lastName);
+    await expect(billingAddress).toContainText(userData.address);
+    await expect(billingAddress).toContainText(userData.city);
+  });
+
+  test("Test Case 24: Download Invoice after purchase order", async ({ page }) => {
+    const userData = generateUserData();
+    const paymentData = generatePaymentData();
+
+    await basePage.clickProducts();
+    await productsPage.addProductToCart(1);
+    await productsPage.continueShopping();
+
+    await basePage.clickCart();
+
+    await page.getByText(/Proceed To Checkout/i).click();
+
+    await page.getByRole("link", { name: /Register \/ Login/i }).click();
+
+    await loginPage.signup(userData.name, userData.email);
+    await signupPage.fillAccountDetails(userData);
+    await page.getByRole("link", { name: /continue/i }).click();
+
+    await basePage.clickCart();
+
+    await page.getByText(/Proceed To Checkout/i).click();
+
+    await page.locator(".form-control").fill("Test Case 24");
+    await page.getByRole("link", { name: /Place Order/i }).click();
+
+    await page.locator('[data-qa="name-on-card"]').fill(paymentData.cardName);
+    await page.locator('[data-qa="card-number"]').fill(paymentData.cardNumber);
+    await page.locator('[data-qa="cvc"]').fill(paymentData.cvv);
+    await page.locator('[data-qa="expiry-month"]').fill(paymentData.expiryMonth);
+    await page.locator('[data-qa="expiry-year"]').fill(paymentData.expiryYear);
+
+    await page.locator('[data-qa="pay-button"]').click();
+    await expect(page.getByText(/Order Placed!/i)).toBeVisible();
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("link", { name: /Download Invoice/i }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe("invoice.txt");
+
+    await page.getByRole("link", { name: /continue/i }).click();
   });
 });

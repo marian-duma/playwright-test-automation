@@ -39,6 +39,6 @@ export class BasePage {
   }
 
   async deleteAccount() {
-    await this.page.getByRole("link", { name: /delete\s*account/i }).click();
+    await this.page.getByRole("link", { name: /delete\s*account/i }).click({ timeout: 5000 });
   }
 }
