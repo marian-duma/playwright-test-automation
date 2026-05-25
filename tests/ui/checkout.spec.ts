@@ -17,11 +17,11 @@ test.describe("Checkout tests", () => {
   let checkoutPage: CheckoutPage;
   let paymentPage: PaymentPage;
 
-  const user: UserData = generateUserData();
-  const paymentData: PaymentData = generatePaymentData();
+  let userData: UserData;
+  let paymentData: PaymentData;
 
   test.beforeEach(async ({ page }) => {
-    handleAds(page);
+    await handleAds(page);
     await page.goto("/");
     await handleGDPR(page);
     await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
@@ -32,6 +32,9 @@ test.describe("Checkout tests", () => {
     signupPage = new SignupPage(page);
     checkoutPage = new CheckoutPage(page);
     paymentPage = new PaymentPage(page);
+
+    userData = generateUserData();
+    paymentData = generatePaymentData();
   });
 
   test.afterEach("Cleanup", async ({ page }) => {
@@ -40,7 +43,7 @@ test.describe("Checkout tests", () => {
       await expect(page.getByText(/account\s*deleted!/i)).toBeVisible();
       await page.getByRole("link", { name: /continue/i }).click();
     } catch (error) {
-      console.log("Cleanup: Butonul 'Delete Account' nu a fost găsit, se continuă execuția.");
+      console.log("Cleanup: No active session found. Skipping logout.");
     }
   });
 
@@ -52,37 +55,31 @@ test.describe("Checkout tests", () => {
     await checkoutPage.proceedToCheckout();
     await page.getByRole("link", { name: /Register \/ Login/i }).click();
 
-    await loginPage.signup(user.name, user.email);
-    await signupPage.fillAccountDetails(user);
+    await loginPage.signup(userData.name, userData.email);
+    await signupPage.fillAccountDetails(userData);
 
     await expect(page.getByText(/account created!/i)).toBeVisible();
     await page.getByRole("link", { name: /continue/i }).click();
-    await expect(page.getByText(`Logged in as ${user.name}`)).toBeVisible();
+    await expect(page.getByText(`Logged in as ${userData.name}`)).toBeVisible();
 
     await basePage.clickCart();
     await checkoutPage.proceedToCheckout();
     await checkoutPage.enterComment("Test 14");
     await checkoutPage.placeOrder();
 
-    await paymentPage.fillPaymentDetails(
-      paymentData.cardName,
-      paymentData.cardNumber,
-      paymentData.cvv,
-      paymentData.expiryMonth,
-      paymentData.expiryYear
-    );
+    await paymentPage.fillPaymentData(paymentData);
     await paymentPage.confirmPayment();
     await expect(page.locator('[data-qa="order-placed"]')).toBeVisible();
   });
 
   test("Test Case 15: Place Order: Register before Checkout", async ({ page }) => {
     await basePage.clickLogin();
-    await loginPage.signup(user.name, user.email);
-    await signupPage.fillAccountDetails(user);
+    await loginPage.signup(userData.name, userData.email);
+    await signupPage.fillAccountDetails(userData);
 
     await expect(page.getByText(/account created!/i)).toBeVisible();
     await page.getByRole("link", { name: /continue/i }).click();
-    await expect(page.getByText(`Logged in as ${user.name}`)).toBeVisible();
+    await expect(page.getByText(`Logged in as ${userData.name}`)).toBeVisible();
 
     await productsPage.addProductToCart(1);
     await productsPage.continueShopping();
@@ -93,31 +90,25 @@ test.describe("Checkout tests", () => {
     await checkoutPage.enterComment("Test 15");
     await checkoutPage.placeOrder();
 
-    await paymentPage.fillPaymentDetails(
-      paymentData.cardName,
-      paymentData.cardNumber,
-      paymentData.cvv,
-      paymentData.expiryMonth,
-      paymentData.expiryYear
-    );
+    await paymentPage.fillPaymentData(paymentData);
     await paymentPage.confirmPayment();
     await expect(page.locator('[data-qa="order-placed"]')).toBeVisible();
   });
 
   test("Test Case 16: Place Order: Login before Checkout", async ({ page }) => {
     await basePage.clickLogin();
-    await loginPage.signup(user.name, user.email);
-    await signupPage.fillAccountDetails(user);
+    await loginPage.signup(userData.name, userData.email);
+    await signupPage.fillAccountDetails(userData);
 
     await expect(page.getByText(/account created!/i)).toBeVisible();
     await page.getByRole("link", { name: /continue/i }).click();
-    await expect(page.getByText(`Logged in as ${user.name}`)).toBeVisible();
+    await expect(page.getByText(`Logged in as ${userData.name}`)).toBeVisible();
 
     await basePage.logout();
 
     await basePage.clickLogin();
-    await loginPage.login(user.email, user.password);
-    await expect(page.getByText(`Logged in as ${user.name}`)).toBeVisible();
+    await loginPage.login(userData.email, userData.password);
+    await expect(page.getByText(`Logged in as ${userData.name}`)).toBeVisible();
 
     await productsPage.addProductToCart(1);
     await productsPage.continueShopping();
@@ -127,20 +118,12 @@ test.describe("Checkout tests", () => {
     await checkoutPage.enterComment("Test 16");
     await checkoutPage.placeOrder();
 
-    await paymentPage.fillPaymentDetails(
-      paymentData.cardName,
-      paymentData.cardNumber,
-      paymentData.cvv,
-      paymentData.expiryMonth,
-      paymentData.expiryYear
-    );
+    await paymentPage.fillPaymentData(paymentData);
     await paymentPage.confirmPayment();
     await expect(page.locator('[data-qa="order-placed"]')).toBeVisible();
   });
 
   test("Test Case 23: Verify address details in checkout page", async ({ page }) => {
-    const userData = generateUserData();
-
     await basePage.clickLogin();
 
     await loginPage.signup(userData.name, userData.email);
@@ -158,16 +141,20 @@ test.describe("Checkout tests", () => {
     await page.getByText(/Proceed To Checkout/i).click();
 
     const deliveryAddress = page.locator("#address_delivery");
-    await expect(deliveryAddress).toContainText(userData.firstName);
-    await expect(deliveryAddress).toContainText(userData.lastName);
-    await expect(deliveryAddress).toContainText(userData.address);
-    await expect(deliveryAddress).toContainText(userData.city);
+    await expect(deliveryAddress).toContainText([
+      userData.firstName,
+      userData.lastName,
+      userData.address,
+      userData.city,
+    ]);
 
     const billingAddress = page.locator("#address_invoice");
-    await expect(billingAddress).toContainText(userData.firstName);
-    await expect(billingAddress).toContainText(userData.lastName);
-    await expect(billingAddress).toContainText(userData.address);
-    await expect(billingAddress).toContainText(userData.city);
+    await expect(billingAddress).toContainText([
+      userData.firstName,
+      userData.lastName,
+      userData.address,
+      userData.city,
+    ]);
   });
 
   test("Test Case 24: Download Invoice after purchase order", async ({ page }) => {
@@ -180,8 +167,7 @@ test.describe("Checkout tests", () => {
 
     await basePage.clickCart();
 
-    await page.getByText(/Proceed To Checkout/i).click();
-
+    await checkoutPage.proceedToCheckout();
     await page.getByRole("link", { name: /Register \/ Login/i }).click();
 
     await loginPage.signup(userData.name, userData.email);
@@ -189,19 +175,14 @@ test.describe("Checkout tests", () => {
     await page.getByRole("link", { name: /continue/i }).click();
 
     await basePage.clickCart();
-
-    await page.getByText(/Proceed To Checkout/i).click();
+    await checkoutPage.proceedToCheckout();
 
     await page.locator(".form-control").fill("Test Case 24");
-    await page.getByRole("link", { name: /Place Order/i }).click();
+    await checkoutPage.placeOrder();
 
-    await page.locator('[data-qa="name-on-card"]').fill(paymentData.cardName);
-    await page.locator('[data-qa="card-number"]').fill(paymentData.cardNumber);
-    await page.locator('[data-qa="cvc"]').fill(paymentData.cvv);
-    await page.locator('[data-qa="expiry-month"]').fill(paymentData.expiryMonth);
-    await page.locator('[data-qa="expiry-year"]').fill(paymentData.expiryYear);
+    await paymentPage.fillPaymentData(paymentData);
+    await paymentPage.confirmPayment();
 
-    await page.locator('[data-qa="pay-button"]').click();
     await expect(page.getByText(/Order Placed!/i)).toBeVisible();
 
     const downloadPromise = page.waitForEvent("download");

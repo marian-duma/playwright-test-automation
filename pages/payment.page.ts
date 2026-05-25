@@ -1,5 +1,5 @@
 import { Page, Locator } from "@playwright/test";
-
+import { PaymentData } from "../utils/user.generator";
 export class PaymentPage {
   readonly page: Page;
   readonly nameOnCardInput: Locator;
@@ -25,6 +25,16 @@ export class PaymentPage {
     await this.cvcInput.fill(cvc);
     await this.expiryMonthInput.fill(month);
     await this.expiryYearInput.fill(year);
+  }
+
+  async fillPaymentData(paymentData: PaymentData) {
+    await this.fillPaymentDetails(
+      paymentData.cardName,
+      paymentData.cardNumber,
+      paymentData.cvv,
+      paymentData.expiryMonth,
+      paymentData.expiryYear
+    );
   }
 
   async confirmPayment() {

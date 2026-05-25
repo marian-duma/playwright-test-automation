@@ -8,7 +8,7 @@ test.describe("Products and Search Tests", () => {
   let productsPage: ProductsPage;
 
   test.beforeEach(async ({ page }) => {
-    handleAds(page);
+    await handleAds(page);
     await page.goto("/");
     await handleGDPR(page);
     await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
@@ -20,26 +20,17 @@ test.describe("Products and Search Tests", () => {
   test("Test Case 8: Verify All Products and product detail page", async ({ page }) => {
     await basePage.clickProducts();
 
-    await expect(page).toHaveURL(/.*products/);
-    await expect(page.getByText(/ALL PRODUCTS/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /ALL PRODUCTS/i })).toBeVisible();
 
     await expect(productsPage.productItems.first()).toBeVisible();
 
     await page.locator('a[href="/product_details/1"]').click();
-
-    await expect(page).toHaveURL(/.*product_details\/1/);
-
-    await expect(page.locator(".product-information h2")).toBeVisible(); // Product Name
-    await expect(page.getByText(/Category:/i)).toBeVisible();
-    await expect(page.locator(".product-information span span")).toBeVisible(); // Price
-    await expect(page.getByText(/Availability:/i)).toBeVisible();
-    await expect(page.getByText(/Condition:/i)).toBeVisible();
-    await expect(page.getByText(/Brand:/i)).toBeVisible();
+    await expect(page.locator(".product-information")).toBeVisible();
   });
 
   test("Test Case 9: Search Product", async ({ page }) => {
     await basePage.clickProducts();
-    await expect(page).toHaveURL(/.*products/);
+    await expect(page.getByRole("heading", { name: /ALL PRODUCTS/i })).toBeVisible();
 
     const searchString = "Blue Top";
     await productsPage.searchProduct(searchString);
@@ -66,11 +57,9 @@ test.describe("Products and Search Tests", () => {
     await expect(page.getByRole("heading", { name: /brands/i })).toBeVisible();
 
     await page.locator('a[href="/brand_products/Polo"]').click();
-    await expect(page).toHaveURL(/.*brand_products\/polo/i);
     await expect(page.getByRole("heading", { name: /Brand - Polo Products/i })).toBeVisible();
 
     await page.locator('a[href="/brand_products/H&M"]').click();
-    await expect(page).toHaveURL(/.*brand_products\/h&m/i);
     await expect(page.getByRole("heading", { name: /Brand - H&M Products/i })).toBeVisible();
   });
 

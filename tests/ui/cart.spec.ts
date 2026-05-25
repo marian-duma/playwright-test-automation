@@ -15,7 +15,7 @@ test.describe("Cart tests", () => {
   let signupPage: SignupPage;
 
   test.beforeEach(async ({ page }) => {
-    handleAds(page);
+    await handleAds(page);
     await page.goto("/");
     await handleGDPR(page);
     await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();

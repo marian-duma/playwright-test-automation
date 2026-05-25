@@ -10,10 +10,11 @@ test.describe("Account operations workflow", () => {
   let basePage: BasePage;
   let loginPage: LoginPage;
   let signupPage: SignupPage;
+
   let user: UserData;
 
   test.beforeEach("Setup", async ({ page }) => {
-    handleAds(page);
+    await handleAds(page);
     await page.goto("/");
     await handleGDPR(page);
     await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
@@ -21,14 +22,17 @@ test.describe("Account operations workflow", () => {
     basePage = new BasePage(page);
     loginPage = new LoginPage(page);
     signupPage = new SignupPage(page);
+
     user = generateUserData();
   });
 
   test.afterEach("Cleanup", async ({ page }) => {
-    if (await page.getByRole("link", { name: /delete\s*account/i }).isVisible()) {
+    try {
       await basePage.deleteAccount();
       await expect(page.getByText(/account\s*deleted!/i)).toBeVisible();
       await page.getByRole("link", { name: /continue/i }).click();
+    } catch (error) {
+      console.log("Cleanup: No active session found. Skipping logout.");
     }
   });
 
