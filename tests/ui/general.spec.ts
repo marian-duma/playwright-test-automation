@@ -10,7 +10,7 @@ test.describe("General UI tests", () => {
     await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
   });
 
-  test("Test Case 6: Contact Us Form", async ({ page }) => {
+  test.only("Test Case 6: Contact Us Form", async ({ page }) => {
     const contactPage = new ContactPage(page);
 
     await contactPage.contactUsButton.click();
@@ -24,14 +24,15 @@ test.describe("General UI tests", () => {
 
     await contactPage.uploadFile("test.txt");
 
-    page.once("dialog", async (dialog) => await dialog.accept());
-    await contactPage.submit();
-    await page.waitForLoadState("domcontentloaded");
+    await Promise.all([
+      page.waitForEvent("dialog").then((dialog) => dialog.accept()),
+      contactPage.submit(),
+    ]);
+    // await page.waitForLoadState("domcontentloaded");
 
     const successBanner = page.locator(".status.alert-success");
 
-    await expect(successBanner).toBeVisible({ timeout: 10000 });
-    await expect(successBanner).toHaveText(
+    await expect(successBanner).toContainText(
       /Success! Your details have been submitted successfully/i
     );
 

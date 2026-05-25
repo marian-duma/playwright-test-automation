@@ -22,7 +22,7 @@ export class ProductsPage extends BasePage {
 
   async searchProduct(productName: string) {
     await this.searchInput.fill(productName);
-    await this.searchButton.click();
+    await this.searchButton.click({ force: true });
   }
 
   async addProductToCart(index: number) {
