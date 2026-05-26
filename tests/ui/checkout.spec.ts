@@ -43,7 +43,7 @@ test.describe("Checkout tests", () => {
       await expect(page.getByText(/account\s*deleted!/i)).toBeVisible();
       await page.getByRole("link", { name: /continue/i }).click();
     } catch (error) {
-      console.log("Cleanup: No active session found. Skipping logout.");
+      console.log("Cleanup: Skipping logout.");
     }
   });
 
@@ -141,20 +141,16 @@ test.describe("Checkout tests", () => {
     await page.getByText(/Proceed To Checkout/i).click();
 
     const deliveryAddress = page.locator("#address_delivery");
-    await expect(deliveryAddress).toContainText([
-      userData.firstName,
-      userData.lastName,
-      userData.address,
-      userData.city,
-    ]);
+    await expect(deliveryAddress).toContainText(userData.firstName);
+    await expect(deliveryAddress).toContainText(userData.lastName);
+    await expect(deliveryAddress).toContainText(userData.address);
+    await expect(deliveryAddress).toContainText(userData.city);
 
     const billingAddress = page.locator("#address_invoice");
-    await expect(billingAddress).toContainText([
-      userData.firstName,
-      userData.lastName,
-      userData.address,
-      userData.city,
-    ]);
+    await expect(billingAddress).toContainText(userData.firstName);
+    await expect(billingAddress).toContainText(userData.lastName);
+    await expect(billingAddress).toContainText(userData.address);
+    await expect(billingAddress).toContainText(userData.city);
   });
 
   test("Test Case 24: Download Invoice after purchase order", async ({ page }) => {

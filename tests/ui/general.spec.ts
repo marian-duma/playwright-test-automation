@@ -23,6 +23,7 @@ test.describe("General UI tests", () => {
     );
 
     await contactPage.uploadFile("test.txt");
+    await contactPage.submitButton.scrollIntoViewIfNeeded();
 
     await Promise.all([
       page.waitForEvent("dialog").then((dialog) => dialog.accept()),
@@ -36,7 +37,7 @@ test.describe("General UI tests", () => {
     );
 
     await contactPage.returnHome();
-    await expect(page.getByRole("heading", { name: /AutomationExercise/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /AutomationExercise/i }).first()).toBeVisible();
   });
 
   test("Test Case 7: Verify Test Cases Page", async ({ page }) => {
@@ -44,7 +45,7 @@ test.describe("General UI tests", () => {
       .locator(".nav")
       .getByRole("link", { name: /test cases/i })
       .click();
-    await expect(page.getByRole("heading", { name: /TEST CASES/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /TEST CASES/i }).first()).toBeVisible();
   });
 
   test("Test Case 10: Verify Subscription in home page", async ({ page }) => {

@@ -32,7 +32,7 @@ test.describe("Account operations workflow", () => {
       await expect(page.getByText(/account\s*deleted!/i)).toBeVisible();
       await page.getByRole("link", { name: /continue/i }).click();
     } catch (error) {
-      console.log("Cleanup: No active session found. Skipping logout.");
+      console.log("Cleanup: Skipping logout.");
     }
   });
 

@@ -62,7 +62,11 @@ test.describe("UI & API Combined Integration Suite", () => {
     await basePage.clickProducts();
     await productsPage.addProductToCart(1);
 
-    await basePage.clickCart();
+    await expect(page.getByRole("heading", { name: /Added!/i })).toBeVisible();
+
+    const viewCartLink = page.locator("#cartModal").getByRole("link", { name: /View Cart/i });
+    await viewCartLink.click();
+
     await checkoutPage.proceedToCheckout();
     await checkoutPage.enterComment("API generated userData checkout test.");
     await checkoutPage.placeOrder();
@@ -82,8 +86,8 @@ test.describe("UI & API Combined Integration Suite", () => {
     const detailRes = await usersApi.getUserDetailByEmail(userData.email);
     expect(detailRes.ok()).toBeTruthy();
     const body = await detailRes.json();
-    expect(body.userData.name).toBe(userData.name);
-    expect(body.userData.email).toBe(userData.email);
+    expect(body.user.name).toBe(userData.name);
+    expect(body.user.email).toBe(userData.email);
 
     await usersApi.deleteAccount(userData.email, userData.password);
   });
@@ -121,15 +125,15 @@ test.describe("UI & API Combined Integration Suite", () => {
     await expect(productsPage.productItems).toHaveCount(apiProductCount);
   });
 
-  test("Test 5: API Data Validation in UI Cart", async () => {
+  test("Test 5: API Data Validation in UI Cart", async ({ page }) => {
     const apiRes = await productsApi.getAllProducts();
     const apiData = await apiRes.json();
     const firstProduct = apiData.products.find((p: any) => p.id === 1);
 
     await productsPage.clickProducts();
     await productsPage.addProductToCart(1);
-    await productsPage.continueShopping();
-    await productsPage.clickCart();
+    const viewCartLink = page.locator("#cartModal").getByRole("link", { name: /View Cart/i });
+    await viewCartLink.click();
 
     const cartPriceText = await cartPage.productPrice(1).innerText();
     expect(cartPriceText).toContain(firstProduct.price);
